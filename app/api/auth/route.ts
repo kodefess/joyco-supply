@@ -65,3 +65,10 @@ export async function POST(request: NextRequest) {
   });
   return response;
 }
+
+/** Logout: hapus cookie sesi; halaman berikutnya kembali ke /gate. */
+export async function DELETE() {
+  const response = NextResponse.json({ success: true });
+  response.cookies.set(AUTH_COOKIE, "", { ...cookieOptions, maxAge: 0 });
+  return response;
+}

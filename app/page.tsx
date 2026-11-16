@@ -4,6 +4,7 @@ import {
   Download,
   Eye,
   LoaderCircle,
+  LogOut,
   Palette,
   ReceiptText,
   RotateCcw,
@@ -27,6 +28,8 @@ import {
 import { StyleSection } from "@/components/studio/style-section";
 import { type ReceiptStore, useReceipt } from "@/hooks/use-receipt";
 import { useReceiptExport } from "@/hooks/use-receipt-export";
+import { useState } from "react";
+
 import { money } from "@/lib/receipt-utils";
 import { SITE } from "@/lib/site";
 import { cn } from "@/lib/utils";
@@ -157,6 +160,34 @@ function StudioRail() {
   );
 }
 
+/** Keluar dari studio: hapus cookie sesi lalu muat ulang ke halaman login. */
+function LogoutButton() {
+  const [busy, setBusy] = useState(false);
+
+  const logout = async () => {
+    setBusy(true);
+    try {
+      await fetch("/api/auth", { method: "DELETE" });
+    } finally {
+      window.location.replace("/");
+    }
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={logout}
+      disabled={busy}
+      title="Log out"
+      aria-label="Log out"
+      className={cn(segButton, "h-auto px-3 hover:text-danger disabled:opacity-60 sm:px-4")}
+    >
+      {busy ? <LoaderCircle className="size-3.5 animate-spin" /> : <LogOut className="size-3.5" />}
+      <span className="hidden md:inline">Log out</span>
+    </button>
+  );
+}
+
 function SiteHeader({ receipt }: { receipt: ReceiptStore }) {
   const toast = useToast();
 
@@ -196,6 +227,7 @@ function SiteHeader({ receipt }: { receipt: ReceiptStore }) {
         <span className="hidden sm:inline">New receipt</span>
       </button>
       <ColorSchemeToggle />
+      <LogoutButton />
     </header>
   );
 }
