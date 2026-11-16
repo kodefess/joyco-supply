@@ -29,9 +29,11 @@ const silkscreen = Silkscreen({
 });
 const sora = Sora({ subsets: ["latin"], variable: "--font-sora" });
 const rubik = Rubik({ subsets: ["latin"], variable: "--font-rubik" });
+// Dimuat sebagai font variabel (tanpa daftar weight). Bila weight statis
+// diminta, Google mengirim URL `/l/font?kit=…&skey=…` yang tanda `&`-nya
+// membuat Turbopack gagal ("next/font/google queries have exactly one entry").
 const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
-  weight: ["400", "600", "800"],
   variable: "--font-bricolage",
 });
 const spaceGrotesk = Space_Grotesk({
