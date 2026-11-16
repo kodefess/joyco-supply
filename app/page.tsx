@@ -63,18 +63,7 @@ function Studio() {
 
         <main className="mx-auto grid w-full max-w-7xl gap-6 px-3 py-6 sm:px-6 lg:grid-cols-[minmax(0,1fr)_26rem] lg:gap-8 lg:px-8 xl:grid-cols-[minmax(0,1fr)_28rem]">
           <div className="flex min-w-0 flex-col gap-6">
-            <div className="px-1">
-              <span className={cn(monoLabel, "inline-block bg-surface-2 px-2 py-1 text-muted-foreground")}>
-                Studio
-              </span>
-              <h1 className="mt-3 text-3xl leading-[1.08] font-semibold tracking-[-0.035em] sm:text-4xl">
-                Receipts that look like <span className="text-brand-text">your</span> brand.
-              </h1>
-              <p className="mt-2 max-w-xl text-[15px] text-muted-foreground">
-                Fill in the details and pick a style — the preview updates as you type and your
-                draft is saved in this browser automatically.
-              </p>
-            </div>
+            <StudioIntro />
             <DetailsSection receipt={receipt} />
             <ItemsSection receipt={receipt} />
             <StyleSection receipt={receipt} />
@@ -157,6 +146,53 @@ function StudioRail() {
         <Diamond className="size-5" />
       </span>
     </aside>
+  );
+}
+
+const STEPS = [
+  { href: "#details", label: "Details" },
+  { href: "#items", label: "Items" },
+  { href: "#style", label: "Style" },
+];
+
+/** Pembuka studio: segmen panel ala JOYCO Hub, copy pendek, tiga langkah. */
+function StudioIntro() {
+  return (
+    <section aria-labelledby="studio-title" className="flex flex-col gap-[2px]">
+      <div className="flex h-9 items-center justify-between bg-surface-2 px-3">
+        <span className={cn(monoLabel, "flex items-center gap-2 text-muted-foreground")}>
+          <span className="block size-1.5 bg-brand" />
+          Studio
+        </span>
+        <span className={cn(monoLabel, "text-muted-foreground")}>Autosaved</span>
+      </div>
+      <div className="bg-surface-2 px-4 pt-5 pb-5 sm:px-5">
+        <h1
+          id="studio-title"
+          className="text-[1.9rem] leading-none font-semibold tracking-[-0.045em] sm:text-[2.35rem]"
+        >
+          Make a receipt.
+        </h1>
+        <p className="mt-2.5 max-w-md text-sm leading-relaxed text-muted-foreground">
+          Add the details, list the items, pick a style. Download or print when it looks right.
+        </p>
+      </div>
+      <nav aria-label="Steps" className="grid grid-cols-3 gap-[2px]">
+        {STEPS.map((step, i) => (
+          <a
+            key={step.href}
+            href={step.href}
+            className="group flex items-center gap-2.5 bg-surface-2 px-3 py-2.5 transition-colors hover:bg-surface-3 sm:px-4"
+          >
+            <span className={cn(monoLabel, "text-brand-text")}>0{i + 1}</span>
+            <span className="text-sm font-medium">{step.label}</span>
+            <span aria-hidden className="ml-auto text-muted-foreground transition-transform group-hover:translate-x-0.5">
+              →
+            </span>
+          </a>
+        ))}
+      </nav>
+    </section>
   );
 }
 
