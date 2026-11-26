@@ -10,22 +10,29 @@
    aktif), satu aksen biru #1337FF, semua sudut kotak. Sama dengan halaman
    login, jadi seluruh app terasa satu sistem. */
 :root {
-  --background: #fafafa;
-  --surface: #f0f0f0;
-  --surface-2: #e4e4e4;
-  --surface-3: #d2d2d2;
-  --foreground: #0b0b0b;
-  --muted-foreground: #666666;
-  --border: rgb(11 11 11 / 0.1);
-  --border-strong: rgb(11 11 11 / 0.18);
+  /* Tema terang: kanvas nyaris putih, kartu putih bersih, chip netral sangat
+     terang, teks navy. Biru hanya sebagai aksen. Kontras: teks ≥ 15:1,
+     muted ≥ 5,6:1 di semua permukaan. */
+  --background: #f2f3f7;
+  --surface: #ffffff;
+  --surface-2: #f4f5f9;
+  --surface-3: #e8ebf2;
+  --foreground: #0b1033;
+  --muted-foreground: #535b78;
+  --border: rgb(11 16 51 / 0.08);
+  --border-strong: rgb(11 16 51 / 0.14);
   --brand: #1337ff;
   --brand-foreground: #ffffff;
   /* Varian untuk teks/ikon biru di atas latar (kontras aman di dark mode). */
   --brand-text: #1337ff;
   --danger: #dc2626;
   --success: #16a34a;
-  --canvas-dot: rgb(11 11 11 / 0.1);
+  --canvas-dot: rgb(11 16 51 / 0.12);
   --shadow-panel: none;
+  /* Kurva gerak (Emil Kowalski): ease-out kuat untuk respons UI. Nama
+     sama dengan token Tailwind, jadi utility `ease-out` ikut pakai kurva ini. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   color-scheme: light;
 }
 
@@ -93,6 +100,28 @@
   --shadow-panel: var(--shadow-panel);
 }
 
+/* Umpan balik tekan untuk semua yang bisa diklik: turun 3% dalam 160ms.
+   Warna hover tetap 150ms ease. Tidak beranimasi saat ditekan lewat
+   keyboard (:focus-visible) — aksi keyboard harus terasa instan. */
+@utility press {
+  transition:
+    scale 160ms var(--ease-out),
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    filter 150ms ease,
+    opacity 150ms ease;
+  &:active:not(:disabled):not(:focus-visible) {
+    scale: 0.97;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    &:active:not(:disabled):not(:focus-visible) {
+      scale: none;
+    }
+  }
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -122,13 +151,17 @@
   }
 }
 
+/* Reduced motion = lebih sedikit gerak, bukan nol: fade & warna tetap
+   jalan, yang dihapus hanya gerakan/posisi dan loop dekoratif. */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    transition-duration: 0.001ms !important;
+  html {
     scroll-behavior: auto !important;
+  }
+  .paid-seal,
+  .flow-dots,
+  .flow-item,
+  .flow-out {
+    animation: none !important;
   }
 }
 
@@ -2075,13 +2108,13 @@
   font-family: var(--font-public-sans), ui-sans-serif, sans-serif;
 }
 :root[data-theme="light"] .gate {
-  --gate-bg: #fafafa;
-  --gate-panel: #f0f0f0;
-  --gate-seg: #e4e4e4;
-  --gate-seg-hi: #d2d2d2;
-  --gate-ink: #0b0b0b;
-  --gate-muted: #666666;
-  --gate-line: rgb(11 11 11 / 0.16);
+  --gate-bg: #f2f3f7;
+  --gate-panel: #ffffff;
+  --gate-seg: #f4f5f9;
+  --gate-seg-hi: #e8ebf2;
+  --gate-ink: #0b1033;
+  --gate-muted: #535b78;
+  --gate-line: rgb(11 16 51 / 0.12);
 }
 .gate-rail {
   display: flex;
@@ -2393,7 +2426,7 @@
   font-size: 0.92rem;
   color: var(--gate-ink);
   box-shadow: inset 0 0 0 1px transparent;
-  transition: box-shadow 0.15s;
+  transition: box-shadow 150ms ease;
 }
 .gate-input::placeholder {
   font-size: 0.78rem;
@@ -2418,11 +2451,17 @@
   width: 2.9rem;
   background: var(--gate-seg);
   color: var(--gate-muted);
-  transition: color 0.15s, background 0.15s;
+  cursor: pointer;
+  transition:
+    scale 160ms var(--ease-out),
+    color 150ms ease,
+    background-color 150ms ease;
 }
-.gate-eye:hover:not(:disabled) {
-  background: var(--gate-seg-hi);
-  color: var(--gate-ink);
+@media (hover: hover) and (pointer: fine) {
+  .gate-eye:hover:not(:disabled) {
+    background: var(--gate-seg-hi);
+    color: var(--gate-ink);
+  }
 }
 .gate-eye:disabled {
   cursor: not-allowed;
@@ -2452,10 +2491,26 @@
   text-transform: uppercase;
   color: #ffffff;
   cursor: pointer;
-  transition: filter 0.15s;
+  transition:
+    scale 160ms var(--ease-out),
+    filter 150ms ease,
+    background-color 150ms ease,
+    color 150ms ease;
 }
-.gate-submit:hover:not(:disabled) {
-  filter: brightness(1.15);
+@media (hover: hover) and (pointer: fine) {
+  .gate-submit:hover:not(:disabled) {
+    filter: brightness(1.15);
+  }
+}
+.gate-eye:active:not(:disabled):not(:focus-visible),
+.gate-submit:active:not(:disabled):not(:focus-visible) {
+  scale: 0.97;
+}
+@media (prefers-reduced-motion: reduce) {
+  .gate-eye:active,
+  .gate-submit:active {
+    scale: none !important;
+  }
 }
 .gate-submit:disabled {
   cursor: not-allowed;
@@ -2496,4 +2551,45 @@
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Baseline mobile (skill mobile-native). Sengaja TIDAK ber-layer supaya */
+/* menang atas utility Tailwind (mis. text-[15px] di input).            */
+/* ------------------------------------------------------------------ */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+/* iOS zoom ke input < 16px dan tidak zoom-out lagi. Desktop tetap ikut desain. */
+@media (pointer: coarse) {
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
+/* Tap langsung (tanpa jeda double-tap) dan label kontrol tidak ikut terseleksi
+   saat ditekan lama. Teks konten tetap bisa diseleksi. */
+button,
+a,
+summary,
+[role="button"],
+[role="tab"],
+[role="radio"],
+[role="switch"] {
+  touch-action: manipulation;
+}
+button,
+summary,
+[role="button"],
+[role="tab"],
+[role="radio"],
+[role="switch"] {
+  -webkit-user-select: none;
+  user-select: none;
+}
+/* viewport-fit=cover: di landscape, jauhkan konten dari notch kiri/kanan. */
+body {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
 }

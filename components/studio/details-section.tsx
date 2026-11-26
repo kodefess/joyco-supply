@@ -3,7 +3,6 @@
 import { useRef, useState } from "react";
 import { Dices, Hash, ImageUp, LoaderCircle, Store, X } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -17,8 +16,8 @@ import {
   FieldShell,
   Section,
   TextField,
-  boxClass,
   controlClass,
+  iconButton,
   segButton,
 } from "@/components/studio/section";
 import type { ReceiptStore } from "@/hooks/use-receipt";
@@ -51,31 +50,31 @@ export function DetailsSection({ receipt }: { receipt: ReceiptStore }) {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data: { receiptNumber: string } = await res.json();
       set("order", data.receiptNumber);
-      toast({ message: `Receipt number ${data.receiptNumber} saved.`, tone: "success" });
+      toast({ message: `No. ${data.receiptNumber} siap.`, tone: "success" });
     } catch (error) {
       console.error("Failed to generate receipt number", error);
-      toast({ message: "Couldn't generate a receipt number. Try again.", tone: "error" });
+      toast({ message: "Nomor gagal dibuat. Coba lagi.", tone: "error" });
     } finally {
       setGenerating(false);
     }
   };
 
   return (
-    <Section id="details" icon={Store} title="Details" description="Who's selling, and how it was paid.">
+    <Section id="details" icon={Store} title="Detail" description="Identitas toko dan metode pembayaran.">
       <div className="grid gap-x-4 gap-y-5 sm:grid-cols-2">
         <TextField
           id="store-name"
-          label="Store name"
+          label="Nama toko"
           value={draft.store}
           onChange={(v) => set("store", v)}
-          placeholder="Your store"
+          placeholder="Nama tokomu"
         />
         <TextField
           id="receipt-title"
-          label="Receipt title"
+          label="Judul nota"
           value={draft.title}
           onChange={(v) => set("title", v)}
-          placeholder="Payment receipt"
+          placeholder="Nota pembayaran"
         />
 
         <LogoField
@@ -86,7 +85,7 @@ export function DetailsSection({ receipt }: { receipt: ReceiptStore }) {
 
         <TextField
           id="order-number"
-          label="Receipt no."
+          label="No. nota"
           value={draft.order}
           onChange={(v) => set("order", v)}
           placeholder="0001"
@@ -95,7 +94,9 @@ export function DetailsSection({ receipt }: { receipt: ReceiptStore }) {
               type="button"
               onClick={generateNumber}
               disabled={generating}
-              title="Generate a receipt number"
+              aria-busy={generating || undefined}
+              aria-label="Buat nomor nota"
+              title="Buat nomor nota"
               className={segButton}
             >
               {generating ? (
@@ -103,33 +104,33 @@ export function DetailsSection({ receipt }: { receipt: ReceiptStore }) {
               ) : (
                 <Hash className="size-3.5" />
               )}
-              <span className="hidden sm:inline">Generate</span>
+              <span className="hidden sm:inline">Buat</span>
             </button>
           }
         />
         <TextField
           id="receipt-date"
-          label="Date"
+          label="Tanggal"
           value={draft.date}
           onChange={(v) => set("date", v)}
           placeholder="DD.MM.YYYY"
         />
         <TextField
           id="payment-method"
-          label="Payment method"
+          label="Metode bayar"
           value={draft.payment}
           onChange={(v) => set("payment", v)}
-          placeholder="Cash, QRIS, card…"
+          placeholder="Cash, QRIS, kartu…"
         />
 
-        <FieldShell id="currency" label="Currency">
+        <FieldShell id="currency" label="Mata uang">
           <Select value={draft.currency} onValueChange={(v) => v && set("currency", v)}>
             <SelectTrigger id="currency" className={cn(controlClass, "w-full justify-between")}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="p-1">
               {currencies.map((c) => (
-                <SelectItem key={c.code} value={c.code} className="py-1.5">
+                <SelectItem key={c.code} value={c.code} className="py-2">
                   <span aria-hidden>{isoToFlag(c.flag)}</span>
                   <span className="font-medium">{c.code}</span>
                   <span className="text-xs text-muted-foreground">{c.label}</span>
@@ -139,7 +140,7 @@ export function DetailsSection({ receipt }: { receipt: ReceiptStore }) {
           </Select>
         </FieldShell>
 
-        <FieldShell id="thanks-1" label="Closing note" className="sm:col-span-2">
+        <FieldShell id="thanks-1" label="Pesan penutup" className="sm:col-span-2">
           <div className="flex gap-[2px]">
             <div className="grid min-w-0 flex-1 gap-[2px] sm:grid-cols-2">
               <Input
@@ -149,23 +150,21 @@ export function DetailsSection({ receipt }: { receipt: ReceiptStore }) {
                 className={controlClass}
               />
               <Input
-                aria-label="Closing note, second line"
+                aria-label="Pesan penutup, baris 2"
                 value={draft.thanks[1]}
                 onChange={(e) => set("thanks", [draft.thanks[0], e.target.value])}
                 className={controlClass}
               />
             </div>
-            <Button
+            <button
               type="button"
-              variant="outline"
-              size="icon"
               onClick={() => set("thanks", pickThankYou(draft.thanks))}
-              aria-label="Suggest another closing note"
-              title="Suggest another"
-              className={cn(boxClass, "h-auto border-0 hover:bg-surface-3 hover:text-foreground")}
+              aria-label="Acak pesan penutup"
+              title="Acak pesan"
+              className={cn(iconButton, "h-auto")}
             >
               <Dices className="size-4" />
-            </Button>
+            </button>
           </div>
         </FieldShell>
       </div>
@@ -187,8 +186,8 @@ function LogoField({
 
   const readFile = (file: File | undefined) => {
     if (!file) return;
-    if (!file.type.startsWith("image/")) return onError("That file isn't an image.");
-    if (file.size > MAX_LOGO_BYTES) return onError("Please choose an image under 2 MB.");
+    if (!file.type.startsWith("image/")) return onError("Itu bukan gambar.");
+    if (file.size > MAX_LOGO_BYTES) return onError("Kegedean. Maks 2 MB.");
     const reader = new FileReader();
     reader.onload = () => onChange(String(reader.result));
     reader.readAsDataURL(file);
@@ -200,6 +199,7 @@ function LogoField({
         ref={inputRef}
         id="logo"
         type="file"
+        tabIndex={-1}
         accept="image/png,image/jpeg,image/webp,image/svg+xml"
         className="sr-only"
         onChange={(e) => {
@@ -208,23 +208,29 @@ function LogoField({
         }}
       />
       {logo ? (
-        <div className="flex items-center gap-3 bg-surface-2 p-2">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={logo} alt="Logo preview" className="size-10 object-cover" />
-          <span className="flex-1 text-sm text-muted-foreground">Logo added</span>
-          <Button type="button" variant="ghost" size="sm" onClick={() => inputRef.current?.click()}>
-            Replace
-          </Button>
-          <Button
+        <div className="flex gap-[2px]">
+          <span className="flex min-w-0 flex-1 items-center gap-3 bg-surface-2 p-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={logo} alt="Logo terpasang" className="size-10 object-cover" />
+            <span className="truncate text-sm text-muted-foreground">Logo terpasang</span>
+          </span>
+          <button
             type="button"
-            variant="ghost"
-            size="icon"
-            aria-label="Remove logo"
+            onClick={() => inputRef.current?.click()}
+            className={cn(segButton, "h-auto")}
+          >
+            <ImageUp className="size-3.5" />
+            Ganti
+          </button>
+          <button
+            type="button"
+            aria-label="Hapus logo"
+            title="Hapus logo"
             onClick={() => onChange("")}
-            className="text-muted-foreground hover:text-danger"
+            className={cn(iconButton, "h-auto w-12 hover:bg-danger hover:text-white")}
           >
             <X className="size-4" />
-          </Button>
+          </button>
         </div>
       ) : (
         <button
@@ -241,17 +247,17 @@ function LogoField({
             readFile(e.dataTransfer.files?.[0]);
           }}
           className={cn(
-            "flex items-center gap-3 border border-dashed border-border-strong bg-surface-2/50 px-3 py-3 text-left transition-colors hover:bg-surface-2",
+            "press flex cursor-pointer items-center gap-3 border border-dashed border-border-strong bg-surface-2/50 px-3 py-3 text-left hover:bg-surface-2",
             dragging && "border-brand bg-brand/10",
           )}
         >
-          <span className="grid size-9 place-items-center bg-surface-3 text-muted-foreground">
+          <span aria-hidden className="grid size-10 shrink-0 place-items-center bg-surface-3 text-muted-foreground">
             <ImageUp className="size-4" />
           </span>
           <span className="text-sm">
-            <span className="font-medium">Upload a square logo</span>
+            <span className="font-medium">{dragging ? "Lepas di sini" : "Unggah logo persegi"}</span>
             <span className="block text-[13px] text-muted-foreground">
-              Drop a file here or click to browse · PNG, JPG, WebP, SVG up to 2 MB
+              Drop atau klik · PNG, JPG, WebP, SVG · maks 2 MB
             </span>
           </span>
         </button>

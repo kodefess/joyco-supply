@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "dev:all": "node scripts/dev-all.mjs",
+    "dev:web": "pnpm --dir web dev"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

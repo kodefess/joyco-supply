@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import { Check, Palette, Shuffle } from "lucide-react";
 
 import { Section, segButton } from "@/components/studio/section";
@@ -9,27 +10,48 @@ import { cn } from "@/lib/utils";
 
 export function StyleSection({ receipt }: { receipt: ReceiptStore }) {
   const { theme, set } = receipt;
+  const groupRef = useRef<HTMLDivElement>(null);
+
+  // Radiogroup ala ARIA: satu tab stop, panah untuk pindah gaya. Pilihan
+  // via keyboard langsung aktif tanpa animasi gerak.
+  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const steps: Record<string, number> = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
+    const step = steps[e.key];
+    const edge = e.key === "Home" ? 0 : e.key === "End" ? themes.length - 1 : undefined;
+    if (step === undefined && edge === undefined) return;
+    e.preventDefault();
+    const current = themes.findIndex((t) => t.id === theme.id);
+    const index = edge ?? (current + step + themes.length) % themes.length;
+    set("themeId", themes[index].id);
+    groupRef.current?.querySelectorAll<HTMLButtonElement>('[role="radio"]')[index]?.focus();
+  };
 
   return (
     <Section
       id="style"
       icon={Palette}
-      title="Style"
+      title="Gaya"
       meta={themes.length}
-      description="All in brand blue — each style has its own layout and typeface."
+      description="Satu warna brand, layout dan font berbeda."
       actions={
         <button
           type="button"
           onClick={() => set("themeId", randomTheme(theme.id).id)}
-          title="Pick a random style"
+          aria-label="Gaya acak"
+          title="Gaya acak"
           className={segButton}
         >
           <Shuffle className="size-3.5" />
-          <span className="hidden sm:inline">Surprise me</span>
+          <span className="hidden sm:inline">Acak</span>
         </button>
       }
     >
-      <div role="radiogroup" aria-label="Receipt style" className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 xl:grid-cols-4">
+      <div
+        ref={groupRef}
+        role="radiogroup"
+        aria-label="Gaya nota"
+        onKeyDown={onKeyDown}
+        className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 xl:grid-cols-4">
         {themes.map((t) => (
           <ThemeTile
             key={t.id}
@@ -57,9 +79,10 @@ function ThemeTile({
       type="button"
       role="radio"
       aria-checked={active}
+      tabIndex={active ? 0 : -1}
       onClick={onSelect}
       className={cn(
-        "group relative flex flex-col overflow-hidden border bg-surface-2 text-left transition-[border-color,background-color,box-shadow] duration-150",
+        "press group relative flex cursor-pointer flex-col overflow-hidden border bg-surface-2 text-left",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
         active
           ? "border-brand bg-brand/10 shadow-[0_0_0_1px_var(--brand)]"
@@ -70,7 +93,7 @@ function ThemeTile({
           (layout) dan typeface-nya. */}
       <span
         className={cn(
-          "relative block h-24 overflow-hidden border-b transition-[filter] duration-150",
+          "relative block h-24 overflow-hidden border-b",
           active ? "border-brand" : "border-border",
           `pattern-${theme.pattern}`,
         )}
@@ -82,7 +105,7 @@ function ThemeTile({
           } as React.CSSProperties
         }
       >
-        <span className="relative block h-full origin-top transition-transform duration-200 group-hover:scale-[1.03]">
+        <span className="relative block h-full origin-top transition-transform duration-200 ease-(--ease-out) motion-safe:group-hover:scale-[1.03]">
           <LayoutSketch theme={theme} />
         </span>
       </span>
@@ -102,7 +125,7 @@ function ThemeTile({
         <span
           aria-hidden
           className={cn(
-            "grid size-4 shrink-0 place-items-center border transition-colors",
+            "grid size-4 shrink-0 place-items-center border transition-colors duration-150",
             active
               ? "border-brand bg-brand text-brand-foreground"
               : "border-border-strong text-transparent group-hover:border-muted-foreground",

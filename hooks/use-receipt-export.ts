@@ -54,10 +54,10 @@ export function useReceiptExport(draft: ReceiptDraft) {
       link.download = `${slugify(draft.store)}-${slugify(draft.order)}.png`;
       link.href = dataUrl;
       link.click();
-      toast({ message: "Image downloaded.", tone: "success" });
+      toast({ message: "PNG berhasil diunduh.", tone: "success" });
     } catch (error) {
       console.error("Failed to generate receipt image", error);
-      toast({ message: "Couldn't create the image. Try again in a moment.", tone: "error" });
+      toast({ message: "Gambar gagal dibuat. Coba lagi.", tone: "error" });
     } finally {
       setDownloading(false);
     }
@@ -66,9 +66,9 @@ export function useReceiptExport(draft: ReceiptDraft) {
   const copySummary = async () => {
     try {
       await navigator.clipboard.writeText(receiptSummary(draft));
-      toast({ message: "Summary copied to clipboard.", tone: "success" });
+      toast({ message: "Ringkasan disalin.", tone: "success" });
     } catch {
-      toast({ message: "Clipboard isn't available here.", tone: "error" });
+      toast({ message: "Clipboard tidak tersedia di sini.", tone: "error" });
     }
   };
 

@@ -8,24 +8,30 @@ import { cn } from "@/lib/utils";
 // kapital, input berlatar segmen dengan garis fokus biru di dalam.
 
 export const controlClass =
-  "h-10 rounded-none border-0 bg-surface-2 px-3 text-[15px] shadow-none transition-[background-color,box-shadow] placeholder:text-muted-foreground/70 hover:bg-surface-3 focus-visible:bg-surface-2 focus-visible:shadow-[inset_0_0_0_1.5px_var(--brand)] focus-visible:ring-0 aria-invalid:shadow-[inset_0_0_0_1.5px_var(--danger)] md:text-sm";
+  "h-10 rounded-none border-0 bg-surface-2 px-3 text-[15px] shadow-none transition-[background-color,box-shadow] duration-150 ease-out placeholder:text-muted-foreground hover:bg-surface-3 focus-visible:bg-surface-2 focus-visible:shadow-[inset_0_0_0_1.5px_var(--brand)] focus-visible:ring-0 aria-invalid:shadow-[inset_0_0_0_1.5px_var(--danger)] md:text-sm";
 
 /** Label mono kecil kapital, dipakai di strip, field, dan badge. */
 export const monoLabel = "font-mono text-[11px] uppercase tracking-[0.06em]";
 
-/** Kotak ikon persegi dalam strip. */
+/** Kotak ikon persegi dalam strip (40px — target sentuh minimum). */
 export const boxClass = "grid size-10 shrink-0 place-items-center bg-surface-2 text-muted-foreground";
+
+/** Kotak ikon yang bisa diklik: hover naik satu tingkat, tekan turun 3%. */
+export const iconButton = cn(
+  boxClass,
+  "press cursor-pointer hover:bg-surface-3 hover:text-foreground disabled:pointer-events-none disabled:opacity-40",
+);
 
 /** Tombol segmen di dalam strip (aksi sekunder). */
 export const segButton = cn(
   monoLabel,
-  "flex h-10 shrink-0 items-center gap-1.5 bg-surface-2 px-3 text-muted-foreground transition-colors hover:bg-surface-3 hover:text-foreground disabled:pointer-events-none disabled:opacity-50",
+  "press flex h-10 shrink-0 cursor-pointer items-center gap-1.5 bg-surface-2 px-3 text-muted-foreground hover:bg-surface-3 hover:text-foreground disabled:pointer-events-none disabled:opacity-50",
 );
 
 /** Tombol utama biru. */
 export const primaryButton = cn(
   monoLabel,
-  "flex h-10 shrink-0 items-center justify-between gap-2 bg-brand px-3 font-semibold text-brand-foreground transition-[filter] hover:brightness-115 disabled:pointer-events-none disabled:opacity-60",
+  "press flex h-10 shrink-0 cursor-pointer items-center justify-between gap-2 bg-brand px-3 font-semibold text-brand-foreground hover:brightness-115 disabled:pointer-events-none disabled:opacity-60",
 );
 
 /** Badge gelap kecil, seperti angka di header kartu JOYCO Hub. */
