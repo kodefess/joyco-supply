@@ -4,7 +4,7 @@ import { useId, useRef, useState } from "react";
 import { Check, ChevronDown } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
-import { boxClass, controlClass, monoLabel } from "@/components/studio/section";
+import { controlClass, iconButton, monoLabel } from "@/components/studio/section";
 import { cn } from "@/lib/utils";
 
 /**
@@ -88,8 +88,8 @@ export function ComboInput({
       <button
         type="button"
         tabIndex={-1}
-        aria-label="Show presets"
-        title="Show presets"
+        aria-label="Lihat preset"
+        title="Lihat preset"
         // mousedown dicegah supaya input tidak kehilangan fokus (dropdown tetap terbuka).
         onMouseDown={(e) => e.preventDefault()}
         onClick={() => {
@@ -98,9 +98,10 @@ export function ComboInput({
           setActive(-1);
           inputRef.current?.focus();
         }}
-        className={cn(boxClass, "h-auto transition-colors hover:bg-surface-3 hover:text-foreground")}
+        className={cn(iconButton, "h-auto")}
       >
-        <ChevronDown className={cn("size-4 transition-transform", visible && "rotate-180")} />
+        {/* Tanpa animasi: list juga dibuka lewat keyboard, harus instan. */}
+        <ChevronDown className={cn("size-4", visible && "rotate-180")} />
       </button>
 
       {visible && (
@@ -110,7 +111,7 @@ export function ComboInput({
           className="absolute inset-x-0 top-full z-30 mt-[2px] bg-surface-2 p-[2px] shadow-[0_12px_24px_-12px_rgb(0_0_0/0.5)] ring-1 ring-border"
         >
           <li className={cn(monoLabel, "px-2.5 pt-1.5 pb-1 text-[10px] text-muted-foreground")} aria-hidden>
-            Presets
+            Preset
           </li>
           {filtered.map((option, i) => {
             const selected = option === value;
@@ -124,7 +125,7 @@ export function ComboInput({
                 onClick={() => pick(option)}
                 onMouseEnter={() => setActive(i)}
                 className={cn(
-                  "flex cursor-pointer items-center justify-between gap-3 px-2.5 py-2 text-sm",
+                  "flex min-h-10 cursor-pointer items-center justify-between gap-3 px-2.5 py-2 text-sm",
                   i === active ? "bg-surface-3 text-foreground" : "text-foreground/85",
                 )}
               >

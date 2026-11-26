@@ -197,11 +197,11 @@ export default function GatePage() {
         kind: "error",
         message:
           typeof data.attemptsLeft === "number"
-            ? `Wrong password. ${data.attemptsLeft} ${data.attemptsLeft === 1 ? "attempt" : "attempts"} left.`
-            : "Something went wrong. Please try again.",
+            ? `Password salah. Sisa ${data.attemptsLeft} percobaan.`
+            : "Terjadi kesalahan. Coba lagi.",
       });
     } catch {
-      setStatus({ kind: "error", message: "Couldn't reach the server. Please try again." });
+      setStatus({ kind: "error", message: "Server tidak merespons. Coba lagi." });
     }
   };
 
@@ -213,7 +213,7 @@ export default function GatePage() {
           <img src="/joyco.png" alt="" width={200} height={200} />
         </span>
         <span className="gate-tab">
-          <span>Private</span>
+          <span>Privat</span>
           <Lock size={15} />
         </span>
         <span className="gate-box">
@@ -243,8 +243,8 @@ export default function GatePage() {
               <Lock size={15} />
             </span>
             <span className="gate-label">
-              {locked ? "Access paused" : "Private studio"}
-              <kbd>{locked ? "10 MIN" : "↵"}</kbd>
+              {locked ? "Akses dijeda" : "Studio privat"}
+              <kbd>{locked ? "10 MNT" : "↵"}</kbd>
             </span>
           </div>
 
@@ -257,23 +257,26 @@ export default function GatePage() {
           </div>
 
           <div className="gate-body">
-            <span className="gate-chip">{locked ? "Locked" : "Sign in"}</span>
-            <h1>{locked ? "Too many attempts" : SITE.title}</h1>
-            <p>
+            <span className="gate-chip">{locked ? "Terkunci" : "Masuk"}</span>
+            <h1>{locked ? "Terlalu banyak percobaan." : SITE.title}</h1>
+            <p id="gate-hint">
               {locked
-                ? "For security, sign-in is paused. Try again in about 10 minutes."
-                : "This studio is private. Enter the password to continue."}
+                ? "Login dijeda demi keamanan. Coba lagi dalam ±10 menit."
+                : "Khusus tim. Masukkan password untuk melanjutkan."}
             </p>
           </div>
 
-          <form onSubmit={submit} className="gate-form">
+          <form onSubmit={submit} className="gate-form" aria-busy={loading || undefined}>
             <div className="gate-field">
+              <label htmlFor="password" className="sr-only">
+                Password
+              </label>
               <input
                 id="password"
                 className="gate-input"
                 type={visible ? "text" : "password"}
-                aria-label="Password"
                 placeholder="Password"
+                aria-describedby={status.kind === "error" ? "gate-error" : "gate-hint"}
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
@@ -288,7 +291,9 @@ export default function GatePage() {
                 type="button"
                 className="gate-eye"
                 onClick={() => setVisible((v) => !v)}
-                aria-label={visible ? "Hide password" : "Show password"}
+                aria-label="Lihat password"
+                aria-pressed={visible}
+                title={visible ? "Sembunyikan" : "Lihat"}
                 disabled={locked}
               >
                 {visible ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -296,8 +301,8 @@ export default function GatePage() {
             </div>
 
             {status.kind === "error" && (
-              <p role="alert" className="gate-error">
-                <CircleAlert size={15} className="shrink-0" />
+              <p id="gate-error" role="alert" className="gate-error">
+                <CircleAlert size={15} aria-hidden className="shrink-0" />
                 {status.message}
               </p>
             )}
@@ -307,7 +312,7 @@ export default function GatePage() {
               className="gate-submit"
               disabled={!password || loading || locked}
             >
-              {loading ? "Checking…" : "Continue"}
+              {loading ? "Memeriksa…" : "Masuk"}
               {loading ? (
                 <LoaderCircle size={16} className="animate-spin" />
               ) : (

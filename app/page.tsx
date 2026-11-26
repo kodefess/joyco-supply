@@ -20,7 +20,7 @@ import { PreviewPanel } from "@/components/studio/preview-panel";
 import {
   Diamond,
   Kbd,
-  boxClass,
+  iconButton,
   monoLabel,
   primaryButton,
   segButton,
@@ -43,9 +43,9 @@ export default function Page() {
 }
 
 const NAV = [
-  { href: "#details", label: "Details", icon: Store },
-  { href: "#items", label: "Items", icon: ShoppingBag },
-  { href: "#style", label: "Style", icon: Palette },
+  { href: "#details", label: "Detail", icon: Store },
+  { href: "#items", label: "Item", icon: ShoppingBag },
+  { href: "#style", label: "Gaya", icon: Palette },
   { href: "#preview", label: "Preview", icon: Eye },
 ];
 
@@ -61,7 +61,7 @@ function Studio() {
       <div className="min-w-0 pb-24 lg:pb-0">
         <SiteHeader receipt={receipt} />
 
-        <main className="mx-auto grid w-full max-w-7xl gap-6 px-3 py-6 sm:px-6 lg:grid-cols-[minmax(0,1fr)_26rem] lg:gap-8 lg:px-8 xl:grid-cols-[minmax(0,1fr)_28rem]">
+        <main className="mx-auto grid w-full max-w-7xl grid-cols-[minmax(0,1fr)] gap-6 px-3 py-6 sm:px-6 lg:grid-cols-[minmax(0,1fr)_26rem] lg:gap-8 lg:px-8 xl:grid-cols-[minmax(0,1fr)_28rem]">
           <div className="flex min-w-0 flex-col gap-6">
             <StudioIntro />
             <DetailsSection receipt={receipt} />
@@ -88,9 +88,13 @@ function Studio() {
             </div>
             <button
               type="button"
-              aria-label="Show preview"
-              className={cn(boxClass, "h-auto w-12 hover:bg-surface-3 hover:text-foreground")}
-              onClick={() => document.getElementById("preview")?.scrollIntoView({ behavior: "smooth" })}
+              aria-label="Lihat preview"
+              className={cn(iconButton, "h-auto w-12")}
+              onClick={() =>
+                document.getElementById("preview")?.scrollIntoView({
+                  behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+                })
+              }
             >
               <Eye className="size-4" />
             </button>
@@ -98,9 +102,10 @@ function Studio() {
               type="button"
               onClick={exporter.download}
               disabled={exporter.downloading}
+              aria-busy={exporter.downloading || undefined}
               className={cn(primaryButton, "h-auto min-h-12 gap-3")}
             >
-              Save
+              {exporter.downloading ? "Memproses…" : "Unduh"}
               {exporter.downloading ? (
                 <LoaderCircle className="size-4 animate-spin" />
               ) : (
@@ -136,7 +141,7 @@ function StudioRail() {
           href={href}
           title={label}
           aria-label={label}
-          className="grid h-[3.25rem] shrink-0 place-items-center bg-surface-2 text-muted-foreground transition-colors hover:bg-surface-3 hover:text-foreground"
+          className="press grid h-[3.25rem] shrink-0 place-items-center bg-surface-2 text-muted-foreground hover:bg-surface-3 hover:text-foreground"
         >
           <Icon className="size-4" />
         </a>
@@ -150,9 +155,9 @@ function StudioRail() {
 }
 
 const STEPS = [
-  { href: "#details", label: "Details" },
-  { href: "#items", label: "Items" },
-  { href: "#style", label: "Style" },
+  { href: "#details", label: "Detail" },
+  { href: "#items", label: "Item" },
+  { href: "#style", label: "Gaya" },
 ];
 
 /** Pembuka studio: segmen panel ala JOYCO Hub, copy pendek, tiga langkah. */
@@ -164,29 +169,32 @@ function StudioIntro() {
           <span className="block size-1.5 bg-brand" />
           Studio
         </span>
-        <span className={cn(monoLabel, "text-muted-foreground")}>Autosaved</span>
+        <span className={cn(monoLabel, "text-muted-foreground")}>Auto-save</span>
       </div>
       <div className="bg-surface-2 px-4 pt-5 pb-5 sm:px-5">
         <h1
           id="studio-title"
           className="text-[1.9rem] leading-none font-semibold tracking-[-0.045em] sm:text-[2.35rem]"
         >
-          Make a receipt.
+          Buat nota.
         </h1>
         <p className="mt-2.5 max-w-md text-sm leading-relaxed text-muted-foreground">
-          Add the details, list the items, pick a style. Download or print when it looks right.
+          Isi detail, tambahkan item, pilih gaya, lalu unduh.
         </p>
       </div>
-      <nav aria-label="Steps" className="grid grid-cols-3 gap-[2px]">
+      <nav aria-label="Langkah" className="grid grid-cols-3 gap-[2px]">
         {STEPS.map((step, i) => (
           <a
             key={step.href}
             href={step.href}
-            className="group flex items-center gap-2.5 bg-surface-2 px-3 py-2.5 transition-colors hover:bg-surface-3 sm:px-4"
+            className="press group flex min-h-10 items-center gap-2.5 bg-surface-2 px-3 py-2.5 hover:bg-surface-3 sm:px-4"
           >
-            <span className={cn(monoLabel, "text-brand-text")}>0{i + 1}</span>
+            <span aria-hidden className={cn(monoLabel, "text-brand-text")}>0{i + 1}</span>
             <span className="text-sm font-medium">{step.label}</span>
-            <span aria-hidden className="ml-auto text-muted-foreground transition-transform group-hover:translate-x-0.5">
+            <span
+              aria-hidden
+              className="ml-auto text-muted-foreground transition-transform duration-200 ease-(--ease-out) motion-safe:group-hover:translate-x-0.5"
+            >
               →
             </span>
           </a>
@@ -214,12 +222,13 @@ function LogoutButton() {
       type="button"
       onClick={logout}
       disabled={busy}
-      title="Log out"
-      aria-label="Log out"
+      aria-busy={busy || undefined}
+      title="Keluar"
+      aria-label="Keluar"
       className={cn(segButton, "h-auto px-3 hover:text-danger disabled:opacity-60 sm:px-4")}
     >
       {busy ? <LoaderCircle className="size-3.5 animate-spin" /> : <LogOut className="size-3.5" />}
-      <span className="hidden md:inline">Log out</span>
+      <span className="hidden md:inline">Keluar</span>
     </button>
   );
 }
@@ -231,8 +240,8 @@ function SiteHeader({ receipt }: { receipt: ReceiptStore }) {
     const previous = receipt.draft;
     receipt.reset();
     toast({
-      message: "Started a fresh receipt.",
-      action: { label: "Undo", onClick: () => receipt.restore(previous) },
+      message: "Nota dikosongkan.",
+      action: { label: "Batalkan", onClick: () => receipt.restore(previous) },
     });
   };
 
@@ -253,14 +262,22 @@ function SiteHeader({ receipt }: { receipt: ReceiptStore }) {
         <span className={cn(monoLabel, "flex min-w-0 flex-col leading-tight")}>
           <b className="font-medium text-foreground">{SITE.title}</b>
           <span className="truncate text-muted-foreground">
-            Studio / {receipt.draft.store || "New receipt"}
+            Studio / {receipt.draft.store || "Nota baru"}
           </span>
         </span>
-        <Kbd className="ml-auto hidden sm:inline">#{receipt.draft.order || "0000"}</Kbd>
+        <Kbd className="ml-auto hidden sm:inline">
+          <span className="sr-only">No. nota </span>#{receipt.draft.order || "0000"}
+        </Kbd>
       </div>
-      <button type="button" onClick={reset} className={cn(segButton, "h-auto px-3 sm:px-4")}>
+      <button
+        type="button"
+        onClick={reset}
+        aria-label="Nota baru"
+        title="Nota baru"
+        className={cn(segButton, "h-auto px-3 sm:px-4")}
+      >
         <RotateCcw className="size-3.5" />
-        <span className="hidden sm:inline">New receipt</span>
+        <span className="hidden sm:inline">Nota baru</span>
       </button>
       <ColorSchemeToggle />
       <LogoutButton />
